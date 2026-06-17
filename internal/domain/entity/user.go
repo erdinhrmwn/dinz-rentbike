@@ -12,7 +12,7 @@ type User struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 
-	Reviews  []Review  `json:"reviews" gorm:"foreignKey:UserID"`
-	Rentals  []Rental  `json:"rentals" gorm:"foreignKey:UserID"`
-	Payments []Payment `json:"payments" gorm:"foreignKey:UserID"`
+	Reviews  []Review  `json:"reviews,omitempty" gorm:"foreignKey:UserID"`
+	Rentals  []Rental  `json:"rentals,omitempty" gorm:"foreignKey:UserID"`
+	Payments []Payment `json:"payments,omitempty" gorm:"foreignKey:UserID"`
 }

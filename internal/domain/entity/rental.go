@@ -16,4 +16,7 @@ type Rental struct {
 
 	User    *User    `json:"user,omitempty" gorm:"foreignKey:UserID"`
 	Vehicle *Vehicle `json:"vehicle,omitempty" gorm:"foreignKey:VehicleID"`
+
+	Review  []Review  `json:"reviews,omitempty" gorm:"foreignKey:RentalID"`
+	Payment []Payment `json:"payments,omitempty" gorm:"foreignKey:RentalID"`
 }
