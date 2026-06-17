@@ -1,11 +1,11 @@
 package bootstrap
 
 import (
+	"gorm.io/gorm"
+
 	"dinz-rentbike/internal/config"
 	"dinz-rentbike/internal/infrastructure/database"
 	"dinz-rentbike/pkg/logger"
-
-	"gorm.io/gorm"
 )
 
 type App struct {

@@ -1,13 +1,13 @@
 package database
 
 import (
-	"dinz-rentbike/internal/config"
-
 	"fmt"
 	"net/url"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	"dinz-rentbike/internal/config"
 )
 
 func Connect(cfg *config.DatabaseConfig) (*gorm.DB, error) {

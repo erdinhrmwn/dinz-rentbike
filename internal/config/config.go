@@ -8,7 +8,7 @@ type Config struct {
 	App      AppConfig
 	Database DatabaseConfig
 	Redis    RedisConfig
-	JWT      JwtConfig
+	Jwt      JwtConfig
 	Xendit   XenditConfig
 	Mailjet  MailjetConfig
 }
@@ -84,7 +84,7 @@ func Load() (*Config, error) {
 			Password: v.GetString("REDIS_PASSWORD"),
 			DB:       v.GetInt("REDIS_DB"),
 		},
-		JWT: JwtConfig{
+		Jwt: JwtConfig{
 			Secret: v.GetString("JWT_SECRET"),
 		},
 		Xendit: XenditConfig{

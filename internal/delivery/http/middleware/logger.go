@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"dinz-rentbike/pkg/logger"
-
-	"github.com/labstack/echo/v4"
+	echo "github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
+
+	"dinz-rentbike/pkg/logger"
 )
 
 func RequestLoggerMiddleware() echo.MiddlewareFunc {

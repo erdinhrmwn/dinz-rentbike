@@ -2,9 +2,6 @@ package bootstrap
 
 import (
 	"context"
-	"dinz-rentbike/internal/delivery/http/middleware"
-	"dinz-rentbike/pkg/logger"
-	"dinz-rentbike/pkg/response"
 	"fmt"
 	"net/http"
 	"os"
@@ -12,8 +9,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/labstack/echo/v4"
+	echo "github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
+
+	"dinz-rentbike/internal/delivery/http/middleware"
+	"dinz-rentbike/pkg/logger"
+	"dinz-rentbike/pkg/response"
 )
 
 func (a *App) Run() {
