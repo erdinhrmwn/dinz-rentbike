@@ -12,7 +12,11 @@ import (
 	echo "github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
 
+	"dinz-rentbike/internal/delivery/http/handler"
 	"dinz-rentbike/internal/delivery/http/middleware"
+	"dinz-rentbike/internal/repository"
+	"dinz-rentbike/internal/usecase"
+	"dinz-rentbike/pkg/jwt"
 	"dinz-rentbike/pkg/logger"
 	"dinz-rentbike/pkg/response"
 )
@@ -26,9 +30,33 @@ func (a *App) Run() {
 	e.Use(echoMiddleware.RequestID())
 	e.Use(middleware.RequestLoggerMiddleware())
 
+	// Repositories
+	userRepo := repository.NewUserRepository(a.DB)
+
+	// Usecases
+	authUsecase := usecase.NewAuthUsecase(userRepo)
+	userUsecase := usecase.NewUserUsecase(userRepo)
+
+	// Auth
+	authManager := jwt.NewAuthManager(&a.Config.Jwt)
+	authMiddleware := middleware.AuthMiddleware(authManager)
+
+	// Handlers
+	authHandler := handler.NewAuthHandler(authUsecase)
+	userHandler := handler.NewUserHandler(userUsecase)
+
+	// Routes
 	e.GET("/", func(c echo.Context) error {
 		return response.SuccessResponse(c, http.StatusOK, "Hello World!", nil)
 	})
+
+	api := e.Group("/api/v1")
+
+	authGroup := api.Group("/auth")
+	authHandler.RegisterRoutes(authGroup)
+
+	userGroup := api.Group("/users", authMiddleware)
+	userHandler.RegisterRoutes(userGroup)
 
 	addr := fmt.Sprintf("%s:%d", a.Config.App.Host, a.Config.App.Port)
 
