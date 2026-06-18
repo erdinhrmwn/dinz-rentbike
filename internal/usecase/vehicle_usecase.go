@@ -41,7 +41,7 @@ func (u *vehicleUsecase) GetByID(ctx context.Context, id int) (*dto.VehicleRespo
 }
 
 func toVehicleResponse(v *entity.Vehicle) dto.VehicleResponse {
-	return dto.VehicleResponse{
+	res := dto.VehicleResponse{
 		ID:           v.ID,
 		Type:         v.Type,
 		Brand:        v.Brand,
@@ -54,4 +54,19 @@ func toVehicleResponse(v *entity.Vehicle) dto.VehicleResponse {
 		CreatedAt:    v.CreatedAt.Format(time.RFC3339),
 		UpdatedAt:    v.UpdatedAt.Format(time.RFC3339),
 	}
+
+	for _, r := range v.Reviews {
+		res.Reviews = append(res.Reviews, dto.ReviewResponse{
+			ID:        r.ID,
+			UserID:    r.UserID,
+			VehicleID: r.VehicleID,
+			RentalID:  r.RentalID,
+			Rating:    r.Rating,
+			Comment:   r.Comment,
+			CreatedAt: r.CreatedAt.Format(time.RFC3339),
+			UpdatedAt: r.UpdatedAt.Format(time.RFC3339),
+		})
+	}
+
+	return res
 }

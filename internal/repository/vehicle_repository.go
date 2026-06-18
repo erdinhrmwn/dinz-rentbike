@@ -28,7 +28,7 @@ func (r *vehicleRepository) FindAll(ctx context.Context) ([]entity.Vehicle, erro
 
 func (r *vehicleRepository) FindByID(ctx context.Context, id int) (*entity.Vehicle, error) {
 	var vehicle entity.Vehicle
-	query := r.db.WithContext(ctx).First(&vehicle, id)
+	query := r.db.WithContext(ctx).Preload("Reviews").First(&vehicle, id)
 	if query.Error != nil {
 		return nil, query.Error
 	}

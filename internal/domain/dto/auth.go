@@ -25,5 +25,5 @@ type LoginResponse struct {
 }
 
 type RegisterResponse struct {
-	User ProfileResponse
+	User UserResponse
 }

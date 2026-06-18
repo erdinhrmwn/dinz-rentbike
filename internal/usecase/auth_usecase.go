@@ -42,7 +42,7 @@ func (u *authUsecase) Register(ctx context.Context, req *dto.RegisterRequest) (*
 	}
 
 	return &dto.RegisterResponse{
-		User: dto.ProfileResponse{
+		User: dto.UserResponse{
 			ID:    user.ID,
 			Name:  user.Name,
 			Email: user.Email,

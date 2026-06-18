@@ -15,7 +15,7 @@ type UserRepository interface {
 }
 
 type UserUsecase interface {
-	GetProfile(ctx context.Context, userID int) (*dto.ProfileResponse, error)
+	GetProfile(ctx context.Context, userID int) (*dto.UserResponse, error)
 	UpdateProfile(ctx context.Context, userID int, req *dto.UpdateProfileRequest) error
 	ChangePassword(ctx context.Context, userID int, req *dto.ChangePasswordRequest) error
 }
