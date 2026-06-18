@@ -153,6 +153,29 @@ func (u *paymentUsecase) CancelPayment(ctx context.Context, userID int, rentalID
 	return &res, nil
 }
 
+func (u *paymentUsecase) ListAll(ctx context.Context) ([]dto.PaymentResponse, error) {
+	payments, err := u.paymentRepo.FindAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var res []dto.PaymentResponse
+	for _, p := range payments {
+		res = append(res, toPaymentResponse(&p))
+	}
+	return res, nil
+}
+
+func (u *paymentUsecase) AdminDetail(ctx context.Context, paymentID int) (*dto.PaymentResponse, error) {
+	payment, err := u.paymentRepo.FindByID(ctx, paymentID)
+	if err != nil {
+		return nil, err
+	}
+
+	res := toPaymentResponse(payment)
+	return &res, nil
+}
+
 func toPaymentResponse(p *entity.Payment) dto.PaymentResponse {
 	res := dto.PaymentResponse{
 		ID:               p.ID,

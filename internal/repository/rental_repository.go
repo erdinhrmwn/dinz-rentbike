@@ -41,6 +41,20 @@ func (r *rentalRepository) FindByUserID(ctx context.Context, userID int) ([]enti
 	return rentals, nil
 }
 
+func (r *rentalRepository) FindAll(ctx context.Context) ([]entity.Rental, error) {
+	var rentals []entity.Rental
+	query := r.db.WithContext(ctx).
+		Preload("Vehicle").
+		Preload("Payment").
+		Preload("User").
+		Order("created_at DESC").
+		Find(&rentals)
+	if query.Error != nil {
+		return nil, query.Error
+	}
+	return rentals, nil
+}
+
 func (r *rentalRepository) Create(ctx context.Context, rental *entity.Rental) error {
 	query := r.db.WithContext(ctx).Create(rental)
 	if query.Error != nil {

@@ -128,6 +128,52 @@ func (u *rentalUsecase) CancelRental(ctx context.Context, userID int, rentalID i
 	return u.vehicleRepo.Update(ctx, vehicle)
 }
 
+func (u *rentalUsecase) ListAll(ctx context.Context) ([]dto.RentalResponse, error) {
+	rentals, err := u.rentalRepo.FindAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	var res []dto.RentalResponse
+	for _, r := range rentals {
+		res = append(res, toRentalResponse(&r))
+	}
+	return res, nil
+}
+
+func (u *rentalUsecase) AdminDetail(ctx context.Context, rentalID int) (*dto.RentalResponse, error) {
+	rental, err := u.rentalRepo.FindByID(ctx, rentalID)
+	if err != nil {
+		return nil, err
+	}
+
+	res := toRentalResponse(rental)
+	return &res, nil
+}
+
+func (u *rentalUsecase) UpdateStatus(ctx context.Context, rentalID int, status string) (*dto.RentalResponse, error) {
+	rental, err := u.rentalRepo.FindByID(ctx, rentalID)
+	if err != nil {
+		return nil, err
+	}
+
+	rental.Status = status
+	if err := u.rentalRepo.Update(ctx, rental); err != nil {
+		return nil, err
+	}
+
+	if status == constants.RentalStatusCancelled || status == constants.RentalStatusCompleted {
+		vehicle, err := u.vehicleRepo.FindByID(ctx, rental.VehicleID)
+		if err == nil {
+			vehicle.Status = constants.VehicleStatusAvailable
+			u.vehicleRepo.Update(ctx, vehicle)
+		}
+	}
+
+	res := toRentalResponse(rental)
+	return &res, nil
+}
+
 func toRentalResponse(r *entity.Rental) dto.RentalResponse {
 	res := dto.RentalResponse{
 		ID:         r.ID,

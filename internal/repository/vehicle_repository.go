@@ -35,6 +35,22 @@ func (r *vehicleRepository) FindByID(ctx context.Context, id int) (*entity.Vehic
 	return &vehicle, nil
 }
 
+func (r *vehicleRepository) Create(ctx context.Context, vehicle *entity.Vehicle) error {
+	query := r.db.WithContext(ctx).Create(vehicle)
+	if query.Error != nil {
+		return query.Error
+	}
+	return nil
+}
+
+func (r *vehicleRepository) Delete(ctx context.Context, id int) error {
+	query := r.db.WithContext(ctx).Delete(&entity.Vehicle{}, id)
+	if query.Error != nil {
+		return query.Error
+	}
+	return nil
+}
+
 func (r *vehicleRepository) Update(ctx context.Context, vehicle *entity.Vehicle) error {
 	query := r.db.WithContext(ctx).Save(vehicle)
 	if query.Error != nil {

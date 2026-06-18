@@ -38,6 +38,17 @@ func (r *paymentRepository) FindByUserID(ctx context.Context, userID int) ([]ent
 	return payments, nil
 }
 
+func (r *paymentRepository) FindAll(ctx context.Context) ([]entity.Payment, error) {
+	var payments []entity.Payment
+	query := r.db.WithContext(ctx).
+		Order("created_at DESC").
+		Find(&payments)
+	if query.Error != nil {
+		return nil, query.Error
+	}
+	return payments, nil
+}
+
 func (r *paymentRepository) FindByRentalID(ctx context.Context, rentalID int) (*entity.Payment, error) {
 	var payment entity.Payment
 	query := r.db.WithContext(ctx).Where("rental_id = ?", rentalID).First(&payment)

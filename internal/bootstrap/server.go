@@ -14,6 +14,7 @@ import (
 
 	"dinz-rentbike/internal/delivery/http/handler"
 	"dinz-rentbike/internal/delivery/http/middleware"
+	"dinz-rentbike/internal/domain/constants"
 	"dinz-rentbike/internal/repository"
 	"dinz-rentbike/internal/usecase"
 	"dinz-rentbike/pkg/jwt"
@@ -56,6 +57,13 @@ func (a *App) Run() {
 	rentalHandler := handler.NewRentalHandler(rentalUsecase)
 	paymentHandler := handler.NewPaymentHandler(paymentUsecase)
 	reviewHandler := handler.NewReviewHandler(reviewUsecase)
+	adminVehicleHandler := handler.NewAdminVehicleHandler(vehicleUsecase)
+	adminRentalHandler := handler.NewAdminRentalHandler(rentalUsecase)
+	adminPaymentHandler := handler.NewAdminPaymentHandler(paymentUsecase)
+
+	// Middleware
+	adminMiddleware := middleware.RoleMiddleware(constants.UserRoleAdmin)
+	customerMiddleware := middleware.RoleMiddleware(constants.UserRoleCustomer)
 
 	// Routes
 	e.GET("/", func(c echo.Context) error {
@@ -67,20 +75,25 @@ func (a *App) Run() {
 	authGroup := api.Group("/auth")
 	authHandler.RegisterRoutes(authGroup)
 
-	userGroup := api.Group("/users", authMiddleware)
+	userGroup := api.Group("/users", authMiddleware, customerMiddleware)
 	userHandler.RegisterRoutes(userGroup)
 
-	vehicleGroup := api.Group("/vehicles", authMiddleware)
+	vehicleGroup := api.Group("/vehicles", authMiddleware, customerMiddleware)
 	vehicleHandler.RegisterRoutes(vehicleGroup)
 
-	rentalGroup := api.Group("/rentals", authMiddleware)
+	rentalGroup := api.Group("/rentals", authMiddleware, customerMiddleware)
 	rentalHandler.RegisterRoutes(rentalGroup)
 
-	paymentGroup := api.Group("/payments", authMiddleware)
+	paymentGroup := api.Group("/payments", authMiddleware, customerMiddleware)
 	paymentHandler.RegisterRoutes(paymentGroup)
 
-	reviewGroup := api.Group("/reviews", authMiddleware)
+	reviewGroup := api.Group("/reviews", authMiddleware, customerMiddleware)
 	reviewHandler.RegisterRoutes(reviewGroup)
+
+	adminGroup := api.Group("/admin", authMiddleware, adminMiddleware)
+	adminVehicleHandler.RegisterRoutes(adminGroup.Group("/vehicles"))
+	adminRentalHandler.RegisterRoutes(adminGroup.Group("/rentals"))
+	adminPaymentHandler.RegisterRoutes(adminGroup.Group("/payments"))
 
 	addr := fmt.Sprintf("%s:%d", a.Config.App.Host, a.Config.App.Port)
 

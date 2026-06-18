@@ -14,6 +14,10 @@ type CancelRentalRequest struct {
 	RentalID int `json:"rental_id" validate:"required"`
 }
 
+type UpdateRentalStatusRequest struct {
+	Status string `json:"status" validate:"required,oneof=pending active completed cancelled"`
+}
+
 // ============================================================
 // Response
 // ============================================================

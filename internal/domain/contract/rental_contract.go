@@ -10,6 +10,7 @@ import (
 type RentalRepository interface {
 	FindByID(ctx context.Context, id int) (*entity.Rental, error)
 	FindByUserID(ctx context.Context, userID int) ([]entity.Rental, error)
+	FindAll(ctx context.Context) ([]entity.Rental, error)
 	Create(ctx context.Context, rental *entity.Rental) error
 	Update(ctx context.Context, rental *entity.Rental) error
 }
@@ -19,4 +20,7 @@ type RentalUsecase interface {
 	UserRentals(ctx context.Context, userID int) ([]dto.RentalResponse, error)
 	CreateRental(ctx context.Context, userID int, req *dto.CreateRentalRequest) (*dto.RentalResponse, error)
 	CancelRental(ctx context.Context, userID int, rentalID int) error
+	ListAll(ctx context.Context) ([]dto.RentalResponse, error)
+	AdminDetail(ctx context.Context, rentalID int) (*dto.RentalResponse, error)
+	UpdateStatus(ctx context.Context, rentalID int, status string) (*dto.RentalResponse, error)
 }
