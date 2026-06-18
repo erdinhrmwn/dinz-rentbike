@@ -20,7 +20,7 @@ func NewReviewUsecase(reviewRepo contract.ReviewRepository, rentalRepo contract.
 	return &reviewUsecase{reviewRepo: reviewRepo, rentalRepo: rentalRepo}
 }
 
-func (u *reviewUsecase) GetByUserID(ctx context.Context, userID int) ([]dto.ReviewResponse, error) {
+func (u *reviewUsecase) UserReviews(ctx context.Context, userID int) ([]dto.ReviewResponse, error) {
 	reviews, err := u.reviewRepo.FindByUserID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func (u *reviewUsecase) GetByUserID(ctx context.Context, userID int) ([]dto.Revi
 	return res, nil
 }
 
-func (u *reviewUsecase) Create(ctx context.Context, userID int, req *dto.CreateReviewRequest) (*dto.ReviewResponse, error) {
+func (u *reviewUsecase) CreateReview(ctx context.Context, userID int, req *dto.CreateReviewRequest) (*dto.ReviewResponse, error) {
 	rental, err := u.rentalRepo.FindByID(ctx, req.RentalID)
 	if err != nil {
 		return nil, err
@@ -66,7 +66,7 @@ func (u *reviewUsecase) Create(ctx context.Context, userID int, req *dto.CreateR
 	return &res, nil
 }
 
-func (u *reviewUsecase) Update(ctx context.Context, userID int, req *dto.CreateReviewRequest) (*dto.ReviewResponse, error) {
+func (u *reviewUsecase) UpdateReview(ctx context.Context, userID int, req *dto.CreateReviewRequest) (*dto.ReviewResponse, error) {
 	review, err := u.reviewRepo.FindByRentalID(ctx, req.RentalID)
 	if err != nil {
 		return nil, err
@@ -89,7 +89,7 @@ func (u *reviewUsecase) Update(ctx context.Context, userID int, req *dto.CreateR
 	return &res, nil
 }
 
-func (u *reviewUsecase) Delete(ctx context.Context, userID int, rentalID int) error {
+func (u *reviewUsecase) DeleteReview(ctx context.Context, userID int, rentalID int) error {
 	review, err := u.reviewRepo.FindByRentalID(ctx, rentalID)
 	if err != nil {
 		return err

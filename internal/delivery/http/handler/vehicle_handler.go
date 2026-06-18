@@ -19,12 +19,12 @@ func NewVehicleHandler(vehicleUsecase contract.VehicleUsecase) *VehicleHandler {
 }
 
 func (h *VehicleHandler) RegisterRoutes(g *echo.Group) {
-	g.GET("", h.GetAll)
-	g.GET("/:id", h.GetByID)
+	g.GET("", h.VehicleList)
+	g.GET("/:id", h.VehicleDetail)
 }
 
-func (h *VehicleHandler) GetAll(c echo.Context) error {
-	vehicles, err := h.vehicleUsecase.GetAll(c.Request().Context())
+func (h *VehicleHandler) VehicleList(c echo.Context) error {
+	vehicles, err := h.vehicleUsecase.VehicleList(c.Request().Context())
 	if err != nil {
 		return response.ErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
@@ -32,13 +32,13 @@ func (h *VehicleHandler) GetAll(c echo.Context) error {
 	return response.SuccessResponse(c, http.StatusOK, "get vehicles success", vehicles)
 }
 
-func (h *VehicleHandler) GetByID(c echo.Context) error {
+func (h *VehicleHandler) VehicleDetail(c echo.Context) error {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		return response.ErrorResponse(c, http.StatusBadRequest, "invalid vehicle id")
 	}
 
-	vehicle, err := h.vehicleUsecase.GetByID(c.Request().Context(), id)
+	vehicle, err := h.vehicleUsecase.VehicleDetail(c.Request().Context(), id)
 	if err != nil {
 		return response.ErrorResponse(c, http.StatusNotFound, err.Error())
 	}

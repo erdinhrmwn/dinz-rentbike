@@ -16,9 +16,9 @@ type PaymentRepository interface {
 }
 
 type PaymentUsecase interface {
-	GetByUserID(ctx context.Context, userID int) ([]dto.PaymentResponse, error)
-	GetByID(ctx context.Context, userID int, paymentID int) (*dto.PaymentResponse, error)
+	UserPayments(ctx context.Context, userID int) ([]dto.PaymentResponse, error)
+	PaymentDetail(ctx context.Context, userID int, paymentID int) (*dto.PaymentResponse, error)
 	GetByRentalID(ctx context.Context, userID int, rentalID int) (*dto.PaymentResponse, error)
-	Create(ctx context.Context, userID int, rentalID int) (*dto.PaymentResponse, error)
-	Cancel(ctx context.Context, userID int, rentalID int) (*dto.PaymentResponse, error)
+	CreatePayment(ctx context.Context, userID int, rentalID int) (*dto.PaymentResponse, error)
+	CancelPayment(ctx context.Context, userID int, rentalID int) (*dto.PaymentResponse, error)
 }

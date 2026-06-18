@@ -19,16 +19,16 @@ func NewReviewHandler(reviewUsecase contract.ReviewUsecase) *ReviewHandler {
 }
 
 func (h *ReviewHandler) RegisterRoutes(g *echo.Group) {
-	g.GET("", h.GetByUserID)
-	g.POST("/create", h.Create)
-	g.POST("/edit", h.Update)
-	g.POST("/delete", h.Delete)
+	g.GET("", h.UserReviews)
+	g.POST("/create", h.CreateReview)
+	g.POST("/edit", h.UpdateReview)
+	g.POST("/delete", h.DeleteReview)
 }
 
-func (h *ReviewHandler) GetByUserID(c echo.Context) error {
+func (h *ReviewHandler) UserReviews(c echo.Context) error {
 	userID := c.Get("user_id").(int)
 
-	reviews, err := h.reviewUsecase.GetByUserID(c.Request().Context(), userID)
+	reviews, err := h.reviewUsecase.UserReviews(c.Request().Context(), userID)
 	if err != nil {
 		return response.ErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
@@ -36,7 +36,7 @@ func (h *ReviewHandler) GetByUserID(c echo.Context) error {
 	return response.SuccessResponse(c, http.StatusOK, "get reviews success", reviews)
 }
 
-func (h *ReviewHandler) Create(c echo.Context) error {
+func (h *ReviewHandler) CreateReview(c echo.Context) error {
 	userID := c.Get("user_id").(int)
 
 	var req dto.CreateReviewRequest
@@ -44,7 +44,7 @@ func (h *ReviewHandler) Create(c echo.Context) error {
 		return response.ErrorResponse(c, http.StatusBadRequest, "invalid request")
 	}
 
-	review, err := h.reviewUsecase.Create(c.Request().Context(), userID, &req)
+	review, err := h.reviewUsecase.CreateReview(c.Request().Context(), userID, &req)
 	if err != nil {
 		return response.ErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
@@ -52,7 +52,7 @@ func (h *ReviewHandler) Create(c echo.Context) error {
 	return response.SuccessResponse(c, http.StatusCreated, "create review success", review)
 }
 
-func (h *ReviewHandler) Update(c echo.Context) error {
+func (h *ReviewHandler) UpdateReview(c echo.Context) error {
 	userID := c.Get("user_id").(int)
 
 	var req dto.CreateReviewRequest
@@ -60,7 +60,7 @@ func (h *ReviewHandler) Update(c echo.Context) error {
 		return response.ErrorResponse(c, http.StatusBadRequest, "invalid request")
 	}
 
-	review, err := h.reviewUsecase.Update(c.Request().Context(), userID, &req)
+	review, err := h.reviewUsecase.UpdateReview(c.Request().Context(), userID, &req)
 	if err != nil {
 		return response.ErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
@@ -68,7 +68,7 @@ func (h *ReviewHandler) Update(c echo.Context) error {
 	return response.SuccessResponse(c, http.StatusOK, "update review success", review)
 }
 
-func (h *ReviewHandler) Delete(c echo.Context) error {
+func (h *ReviewHandler) DeleteReview(c echo.Context) error {
 	userID := c.Get("user_id").(int)
 
 	var req dto.CreateReviewRequest
@@ -76,7 +76,7 @@ func (h *ReviewHandler) Delete(c echo.Context) error {
 		return response.ErrorResponse(c, http.StatusBadRequest, "invalid request")
 	}
 
-	if err := h.reviewUsecase.Delete(c.Request().Context(), userID, req.RentalID); err != nil {
+	if err := h.reviewUsecase.DeleteReview(c.Request().Context(), userID, req.RentalID); err != nil {
 		return response.ErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 

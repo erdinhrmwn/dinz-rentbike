@@ -21,7 +21,7 @@ func NewRentalUsecase(rentalRepo contract.RentalRepository, vehicleRepo contract
 	return &rentalUsecase{rentalRepo: rentalRepo, vehicleRepo: vehicleRepo}
 }
 
-func (u *rentalUsecase) GetByID(ctx context.Context, userID int, rentalID int) (*dto.RentalResponse, error) {
+func (u *rentalUsecase) RentalDetail(ctx context.Context, userID int, rentalID int) (*dto.RentalResponse, error) {
 	rental, err := u.rentalRepo.FindByID(ctx, rentalID)
 	if err != nil {
 		return nil, err
@@ -35,7 +35,7 @@ func (u *rentalUsecase) GetByID(ctx context.Context, userID int, rentalID int) (
 	return &res, nil
 }
 
-func (u *rentalUsecase) GetByUserID(ctx context.Context, userID int) ([]dto.RentalResponse, error) {
+func (u *rentalUsecase) UserRentals(ctx context.Context, userID int) ([]dto.RentalResponse, error) {
 	rentals, err := u.rentalRepo.FindByUserID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (u *rentalUsecase) GetByUserID(ctx context.Context, userID int) ([]dto.Rent
 	return res, nil
 }
 
-func (u *rentalUsecase) Create(ctx context.Context, userID int, req *dto.CreateRentalRequest) (*dto.RentalResponse, error) {
+func (u *rentalUsecase) CreateRental(ctx context.Context, userID int, req *dto.CreateRentalRequest) (*dto.RentalResponse, error) {
 	startTime, err := time.Parse(time.RFC3339, req.StartTime)
 	if err != nil {
 		return nil, errors.New("invalid start time format")
@@ -100,7 +100,7 @@ func (u *rentalUsecase) Create(ctx context.Context, userID int, req *dto.CreateR
 	return &res, nil
 }
 
-func (u *rentalUsecase) Cancel(ctx context.Context, userID int, rentalID int) error {
+func (u *rentalUsecase) CancelRental(ctx context.Context, userID int, rentalID int) error {
 	rental, err := u.rentalRepo.FindByID(ctx, rentalID)
 	if err != nil {
 		return err
@@ -125,11 +125,7 @@ func (u *rentalUsecase) Cancel(ctx context.Context, userID int, rentalID int) er
 	}
 
 	vehicle.Status = constants.VehicleStatusAvailable
-	if err := u.vehicleRepo.Update(ctx, vehicle); err != nil {
-		return err
-	}
-
-	return nil
+	return u.vehicleRepo.Update(ctx, vehicle)
 }
 
 func toRentalResponse(r *entity.Rental) dto.RentalResponse {

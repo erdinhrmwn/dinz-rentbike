@@ -14,6 +14,6 @@ type VehicleRepository interface {
 }
 
 type VehicleUsecase interface {
-	GetAll(ctx context.Context) ([]dto.VehicleResponse, error)
-	GetByID(ctx context.Context, id int) (*dto.VehicleResponse, error)
+	VehicleList(ctx context.Context) ([]dto.VehicleResponse, error)
+	VehicleDetail(ctx context.Context, id int) (*dto.VehicleResponse, error)
 }

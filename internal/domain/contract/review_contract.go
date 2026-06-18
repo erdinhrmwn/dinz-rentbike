@@ -17,8 +17,8 @@ type ReviewRepository interface {
 }
 
 type ReviewUsecase interface {
-	GetByUserID(ctx context.Context, userID int) ([]dto.ReviewResponse, error)
-	Create(ctx context.Context, userID int, req *dto.CreateReviewRequest) (*dto.ReviewResponse, error)
-	Update(ctx context.Context, userID int, req *dto.CreateReviewRequest) (*dto.ReviewResponse, error)
-	Delete(ctx context.Context, userID int, rentalID int) error
+	UserReviews(ctx context.Context, userID int) ([]dto.ReviewResponse, error)
+	CreateReview(ctx context.Context, userID int, req *dto.CreateReviewRequest) (*dto.ReviewResponse, error)
+	UpdateReview(ctx context.Context, userID int, req *dto.CreateReviewRequest) (*dto.ReviewResponse, error)
+	DeleteReview(ctx context.Context, userID int, rentalID int) error
 }

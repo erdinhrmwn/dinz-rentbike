@@ -15,8 +15,8 @@ type RentalRepository interface {
 }
 
 type RentalUsecase interface {
-	GetByID(ctx context.Context, userID int, rentalID int) (*dto.RentalResponse, error)
-	GetByUserID(ctx context.Context, userID int) ([]dto.RentalResponse, error)
-	Create(ctx context.Context, userID int, req *dto.CreateRentalRequest) (*dto.RentalResponse, error)
-	Cancel(ctx context.Context, userID int, rentalID int) error
+	RentalDetail(ctx context.Context, userID int, rentalID int) (*dto.RentalResponse, error)
+	UserRentals(ctx context.Context, userID int) ([]dto.RentalResponse, error)
+	CreateRental(ctx context.Context, userID int, req *dto.CreateRentalRequest) (*dto.RentalResponse, error)
+	CancelRental(ctx context.Context, userID int, rentalID int) error
 }

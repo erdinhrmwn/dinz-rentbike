@@ -17,7 +17,7 @@ func NewVehicleUsecase(vehicleRepo contract.VehicleRepository) contract.VehicleU
 	return &vehicleUsecase{vehicleRepo: vehicleRepo}
 }
 
-func (u *vehicleUsecase) GetAll(ctx context.Context) ([]dto.VehicleResponse, error) {
+func (u *vehicleUsecase) VehicleList(ctx context.Context) ([]dto.VehicleResponse, error) {
 	vehicles, err := u.vehicleRepo.FindAll(ctx)
 	if err != nil {
 		return nil, err
@@ -30,7 +30,7 @@ func (u *vehicleUsecase) GetAll(ctx context.Context) ([]dto.VehicleResponse, err
 	return res, nil
 }
 
-func (u *vehicleUsecase) GetByID(ctx context.Context, id int) (*dto.VehicleResponse, error) {
+func (u *vehicleUsecase) VehicleDetail(ctx context.Context, id int) (*dto.VehicleResponse, error) {
 	vehicle, err := u.vehicleRepo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
