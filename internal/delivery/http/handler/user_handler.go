@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"strconv"
 
 	echo "github.com/labstack/echo/v4"
 
@@ -26,10 +25,7 @@ func (h *UserHandler) RegisterRoutes(g *echo.Group) {
 }
 
 func (h *UserHandler) GetProfile(c echo.Context) error {
-	userID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return response.ErrorResponse(c, http.StatusBadRequest, "invalid user id")
-	}
+	userID := c.Get("user_id").(int)
 
 	profile, err := h.userUsecase.GetProfile(c.Request().Context(), userID)
 	if err != nil {
@@ -40,10 +36,7 @@ func (h *UserHandler) GetProfile(c echo.Context) error {
 }
 
 func (h *UserHandler) UpdateProfile(c echo.Context) error {
-	userID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return response.ErrorResponse(c, http.StatusBadRequest, "invalid user id")
-	}
+	userID := c.Get("user_id").(int)
 
 	var req dto.UpdateProfileRequest
 	if err := c.Bind(&req); err != nil {
@@ -58,10 +51,7 @@ func (h *UserHandler) UpdateProfile(c echo.Context) error {
 }
 
 func (h *UserHandler) ChangePassword(c echo.Context) error {
-	userID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return response.ErrorResponse(c, http.StatusBadRequest, "invalid user id")
-	}
+	userID := c.Get("user_id").(int)
 
 	var req dto.ChangePasswordRequest
 	if err := c.Bind(&req); err != nil {

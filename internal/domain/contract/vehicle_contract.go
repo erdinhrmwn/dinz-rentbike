@@ -10,6 +10,7 @@ import (
 type VehicleRepository interface {
 	FindAll(ctx context.Context) ([]entity.Vehicle, error)
 	FindByID(ctx context.Context, id int) (*entity.Vehicle, error)
+	Update(ctx context.Context, vehicle *entity.Vehicle) error
 }
 
 type VehicleUsecase interface {
