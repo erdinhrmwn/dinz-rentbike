@@ -1,0 +1,817 @@
+openapi: "3.0.3"
+info:
+  title: Dinz RentBike API
+  description: Motorcycle and car rental API
+  version: "1.0.0"
+  contact:
+    name: Dinz RentBike
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Development server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # ---- Auth ----
+    RegisterRequest:
+      type: object
+      required: [name, email, phone, password]
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 255
+          example: Budi Santoso
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          example: budi@rentbike.com
+        phone:
+          type: string
+          minLength: 10
+          maxLength: 20
+          example: "081234567890"
+        password:
+          type: string
+          minLength: 6
+          maxLength: 255
+          example: password123
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@rentbike.com
+        password:
+          type: string
+          example: password123
+
+    LoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            token:
+              type: string
+
+    RegisterResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            user:
+              $ref: "#/components/schemas/UserResponse"
+
+    # ---- User ----
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        role:
+          type: string
+          enum: [customer, admin]
+        created_at:
+          type: string
+        updated_at:
+          type: string
+
+    UpdateProfileRequest:
+      type: object
+      required: [name, phone]
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+
+    ChangePasswordRequest:
+      type: object
+      required: [old_password, new_password, confirm_password]
+      properties:
+        old_password:
+          type: string
+          minLength: 6
+        new_password:
+          type: string
+          minLength: 6
+        confirm_password:
+          type: string
+          minLength: 6
+
+    # ---- Vehicle ----
+    VehicleResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        type:
+          type: string
+          enum: [motor, mobil]
+        brand:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+          nullable: true
+        image_url:
+          type: string
+          nullable: true
+        price_per_hour:
+          type: number
+        status:
+          type: string
+          enum: [available, rented, maintenance]
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReviewResponse"
+
+    CreateVehicleRequest:
+      type: object
+      required: [type, brand, name, category, price_per_hour]
+      properties:
+        type:
+          type: string
+          enum: [motor, mobil]
+        brand:
+          type: string
+        name:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+        image_url:
+          type: string
+        price_per_hour:
+          type: number
+
+    UpdateVehicleRequest:
+      allOf:
+        - $ref: "#/components/schemas/CreateVehicleRequest"
+        - type: object
+          required: [status]
+          properties:
+            status:
+              type: string
+              enum: [available, rented, maintenance]
+
+    # ---- Rental ----
+    CreateRentalRequest:
+      type: object
+      required: [vehicle_id, start_time, end_time]
+      properties:
+        vehicle_id:
+          type: integer
+        start_time:
+          type: string
+          format: date-time
+          example: "2026-06-18T10:00:00+07:00"
+        end_time:
+          type: string
+          format: date-time
+          example: "2026-06-18T12:00:00+07:00"
+
+    CancelRentalRequest:
+      type: object
+      required: [rental_id]
+      properties:
+        rental_id:
+          type: integer
+
+    UpdateRentalStatusRequest:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [pending, active, completed, cancelled]
+
+    RentalResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        vehicle_id:
+          type: integer
+        start_time:
+          type: string
+        end_time:
+          type: string
+        total_hours:
+          type: integer
+        total_price:
+          type: number
+        status:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        vehicle:
+          $ref: "#/components/schemas/VehicleResponse"
+        payment:
+          $ref: "#/components/schemas/PaymentResponse"
+        review:
+          $ref: "#/components/schemas/ReviewResponse"
+
+    # ---- Payment ----
+    PaymentRequest:
+      type: object
+      required: [rental_id]
+      properties:
+        rental_id:
+          type: integer
+
+    PaymentResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        rental_id:
+          type: integer
+        amount:
+          type: number
+        status:
+          type: string
+          enum: [pending, paid, failed, expired]
+        payment_method:
+          type: string
+          nullable: true
+        xendit_invoice_id:
+          type: string
+          nullable: true
+        xendit_payment_url:
+          type: string
+          nullable: true
+        paid_at:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+        updated_at:
+          type: string
+
+    # ---- Review ----
+    CreateReviewRequest:
+      type: object
+      required: [rental_id, rating]
+      properties:
+        rental_id:
+          type: integer
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+        comment:
+          type: string
+          maxLength: 500
+
+    ReviewResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        vehicle_id:
+          type: integer
+        rental_id:
+          type: integer
+        rating:
+          type: integer
+        comment:
+          type: string
+          nullable: true
+        created_at:
+          type: string
+        updated_at:
+          type: string
+        user:
+          $ref: "#/components/schemas/UserResponse"
+        vehicle:
+          $ref: "#/components/schemas/VehicleResponse"
+
+    # ---- Common ----
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data: {}
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          nullable: true
+
+  responses:
+    Unauthorized:
+      description: Invalid or missing token
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Access denied
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+paths:
+  # ============================================================
+  # Auth
+  # ============================================================
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RegisterResponse"
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "401":
+          description: Invalid email or password
+
+  # ============================================================
+  # User
+  # ============================================================
+  /users/me:
+    get:
+      tags: [User]
+      summary: Get user profile
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /users/update:
+    put:
+      tags: [User]
+      summary: Update user profile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileRequest"
+      responses:
+        "200":
+          description: Profile updated successfully
+
+  /users/change-password:
+    patch:
+      tags: [User]
+      summary: Change user password
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+      responses:
+        "200":
+          description: Password changed successfully
+        "400":
+          description: Old password is incorrect
+
+  # ============================================================
+  # Vehicle
+  # ============================================================
+  /vehicles:
+    get:
+      tags: [Vehicle]
+      summary: List all vehicles
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Vehicles retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /vehicles/{id}:
+    get:
+      tags: [Vehicle]
+      summary: Vehicle detail (includes reviews)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Vehicles retrieved successfully
+        "404":
+          description: Vehicle not found
+
+  # ============================================================
+  # Rental
+  # ============================================================
+  /rentals:
+    get:
+      tags: [Rental]
+      summary: List user rentals
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Rentals retrieved successfully
+
+  /rentals/{id}:
+    get:
+      tags: [Rental]
+      summary: Rental detail (includes payment & review)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Rentals retrieved successfully
+        "404":
+          description: Rental not found
+
+  /rentals/create:
+    post:
+      tags: [Rental]
+      summary: Create new rental
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRentalRequest"
+      responses:
+        "201":
+          description: Rental created successfully
+        "400":
+          description: Vehicle not available
+
+  /rentals/cancel:
+    post:
+      tags: [Rental]
+      summary: Cancel rental
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelRentalRequest"
+      responses:
+        "200":
+          description: Rental cancelled successfully
+
+  # ============================================================
+  # Payment
+  # ============================================================
+  /payments:
+    get:
+      tags: [Payment]
+      summary: List user payments
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Payments retrieved successfully
+    post:
+      tags: [Payment]
+      summary: Create payment (generate Xendit invoice)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRequest"
+      responses:
+        "201":
+          description: Payment created (includes xendit_payment_url)
+        "400":
+          description: Rental is not in pending status
+
+  /payments/{id}:
+    get:
+      tags: [Payment]
+      summary: Payment detail
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Payments retrieved successfully
+
+  /payments/cancel:
+    post:
+      tags: [Payment]
+      summary: Cancel payment (cancel Xendit invoice)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentRequest"
+      responses:
+        "200":
+          description: Payment cancelled successfully
+
+  # ============================================================
+  # Review
+  # ============================================================
+  /reviews:
+    get:
+      tags: [Review]
+      summary: List user reviews
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Reviews retrieved successfully
+    post:
+      tags: [Review]
+      summary: Create review
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewRequest"
+      responses:
+        "201":
+          description: Review created successfully
+        "400":
+          description: Rental not yet completed
+
+  /reviews/edit:
+    post:
+      tags: [Review]
+      summary: Edit review
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewRequest"
+      responses:
+        "200":
+          description: Review updated successfully
+
+  /reviews/delete:
+    post:
+      tags: [Review]
+      summary: Delete review
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReviewRequest"
+      responses:
+        "200":
+          description: Review deleted successfully
+
+  # ============================================================
+  # Admin - Vehicles
+  # ============================================================
+  /admin/vehicles:
+    post:
+      tags: [Admin]
+      summary: "[Admin] Create vehicle"
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVehicleRequest"
+      responses:
+        "201":
+          description: Vehicle created successfully
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /admin/vehicles/{id}:
+    put:
+      tags: [Admin]
+      summary: "[Admin] Update vehicle"
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateVehicleRequest"
+      responses:
+        "200":
+          description: Vehicle updated successfully
+    delete:
+      tags: [Admin]
+      summary: "[Admin] Delete vehicle"
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Vehicle deleted successfully
+
+  # ============================================================
+  # Admin - Rentals
+  # ============================================================
+  /admin/rentals:
+    get:
+      tags: [Admin]
+      summary: "[Admin] List all rentals"
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Rentals retrieved successfully
+
+  /admin/rentals/{id}:
+    get:
+      tags: [Admin]
+      summary: "[Admin] Rental detail"
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Rentals retrieved successfully
+
+  /admin/rentals/{id}/status:
+    patch:
+      tags: [Admin]
+      summary: "[Admin] Update rental status"
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRentalStatusRequest"
+      responses:
+        "200":
+          description: Rental status updated successfully
+
+  # ============================================================
+  # Admin - Payments
+  # ============================================================
+  /admin/payments:
+    get:
+      tags: [Admin]
+      summary: "[Admin] List all payments"
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Payments retrieved successfully
+
+  /admin/payments/{id}:
+    get:
+      tags: [Admin]
+      summary: "[Admin] Payment detail"
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Payments retrieved successfully
