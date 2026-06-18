@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"strconv"
 
+	echo "github.com/labstack/echo/v4"
+
 	"dinz-rentbike/internal/domain/contract"
 	"dinz-rentbike/internal/domain/dto"
 	"dinz-rentbike/pkg/response"
-
-	echo "github.com/labstack/echo/v4"
 )
 
 type UserHandler struct {

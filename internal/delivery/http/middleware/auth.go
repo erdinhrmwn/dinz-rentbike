@@ -1,11 +1,12 @@
 package middleware
 
 import (
-	"dinz-rentbike/pkg/jwt"
-	"dinz-rentbike/pkg/response"
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	echo "github.com/labstack/echo/v4"
+
+	"dinz-rentbike/pkg/jwt"
+	"dinz-rentbike/pkg/response"
 )
 
 func AuthMiddleware(authManager *jwt.AuthManager) echo.MiddlewareFunc {
@@ -22,6 +23,7 @@ func AuthMiddleware(authManager *jwt.AuthManager) echo.MiddlewareFunc {
 			}
 
 			c.Set("user_id", claims.UserID)
+			c.Set("user_role", claims.UserRole)
 
 			return next(c)
 		}

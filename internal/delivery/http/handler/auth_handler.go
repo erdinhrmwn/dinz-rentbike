@@ -3,11 +3,11 @@ package handler
 import (
 	"net/http"
 
+	echo "github.com/labstack/echo/v4"
+
 	"dinz-rentbike/internal/domain/contract"
 	"dinz-rentbike/internal/domain/dto"
 	"dinz-rentbike/pkg/response"
-
-	echo "github.com/labstack/echo/v4"
 )
 
 type AuthHandler struct {

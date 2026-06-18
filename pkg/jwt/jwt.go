@@ -1,16 +1,18 @@
 package jwt
 
 import (
-	"dinz-rentbike/internal/config"
 	"errors"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
+	jwt "github.com/golang-jwt/jwt/v5"
+
+	"dinz-rentbike/internal/config"
 )
 
 type JwtClaims struct {
 	jwt.RegisteredClaims
-	UserID uint `json:"user_id"`
+	UserID   int    `json:"user_id"`
+	UserRole string `json:"user_role"`
 }
 
 type AuthManager struct {
@@ -23,9 +25,10 @@ func NewAuthManager(cfg *config.JwtConfig) *AuthManager {
 	}
 }
 
-func (am *AuthManager) GenerateToken(userID uint) (*string, error) {
+func (am *AuthManager) GenerateToken(userID int, role string) (string, error) {
 	claims := JwtClaims{
-		UserID: userID,
+		UserID:   userID,
+		UserRole: role,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -35,10 +38,10 @@ func (am *AuthManager) GenerateToken(userID uint) (*string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(am.secret))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return &tokenString, nil
+	return tokenString, nil
 }
 
 func (am *AuthManager) VerifyToken(tokenString string) (*JwtClaims, error) {

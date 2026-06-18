@@ -10,15 +10,17 @@ import (
 	"dinz-rentbike/internal/domain/contract"
 	"dinz-rentbike/internal/domain/dto"
 	"dinz-rentbike/internal/domain/entity"
+	"dinz-rentbike/pkg/jwt"
 	"dinz-rentbike/pkg/utils"
 )
 
 type authUsecase struct {
-	userRepo contract.UserRepository
+	userRepo    contract.UserRepository
+	authManager *jwt.AuthManager
 }
 
-func NewAuthUsecase(userRepo contract.UserRepository) contract.AuthUsecase {
-	return &authUsecase{userRepo: userRepo}
+func NewAuthUsecase(userRepo contract.UserRepository, authManager *jwt.AuthManager) contract.AuthUsecase {
+	return &authUsecase{userRepo: userRepo, authManager: authManager}
 }
 
 func (u *authUsecase) Register(ctx context.Context, req *dto.RegisterRequest) (*dto.RegisterResponse, error) {
@@ -63,7 +65,12 @@ func (u *authUsecase) Login(ctx context.Context, req *dto.LoginRequest) (*dto.Lo
 		return nil, errors.New("invalid email or password")
 	}
 
+	token, err := u.authManager.GenerateToken(user.ID, user.Role)
+	if err != nil {
+		return nil, err
+	}
+
 	return &dto.LoginResponse{
-		Token: "jwt-token-placeholder",
+		Token: token,
 	}, nil
 }

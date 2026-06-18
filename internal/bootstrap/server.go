@@ -30,20 +30,23 @@ func (a *App) Run() {
 	e.Use(echoMiddleware.RequestID())
 	e.Use(middleware.RequestLoggerMiddleware())
 
-	// Repositories
-	userRepo := repository.NewUserRepository(a.DB)
-
-	// Usecases
-	authUsecase := usecase.NewAuthUsecase(userRepo)
-	userUsecase := usecase.NewUserUsecase(userRepo)
-
 	// Auth
 	authManager := jwt.NewAuthManager(&a.Config.Jwt)
 	authMiddleware := middleware.AuthMiddleware(authManager)
 
+	// Repositories
+	userRepo := repository.NewUserRepository(a.DB)
+	vehicleRepo := repository.NewVehicleRepository(a.DB)
+
+	// Usecases
+	authUsecase := usecase.NewAuthUsecase(userRepo, authManager)
+	userUsecase := usecase.NewUserUsecase(userRepo)
+	vehicleUsecase := usecase.NewVehicleUsecase(vehicleRepo)
+
 	// Handlers
 	authHandler := handler.NewAuthHandler(authUsecase)
 	userHandler := handler.NewUserHandler(userUsecase)
+	vehicleHandler := handler.NewVehicleHandler(vehicleUsecase)
 
 	// Routes
 	e.GET("/", func(c echo.Context) error {
@@ -57,6 +60,9 @@ func (a *App) Run() {
 
 	userGroup := api.Group("/users", authMiddleware)
 	userHandler.RegisterRoutes(userGroup)
+
+	vehicleGroup := api.Group("/vehicles", authMiddleware)
+	vehicleHandler.RegisterRoutes(vehicleGroup)
 
 	addr := fmt.Sprintf("%s:%d", a.Config.App.Host, a.Config.App.Port)
 
