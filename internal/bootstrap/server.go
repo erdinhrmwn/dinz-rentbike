@@ -38,18 +38,21 @@ func (a *App) Run() {
 	userRepo := repository.NewUserRepository(a.DB)
 	vehicleRepo := repository.NewVehicleRepository(a.DB)
 	rentalRepo := repository.NewRentalRepository(a.DB)
+	paymentRepo := repository.NewPaymentRepository(a.DB)
 
 	// Usecases
 	authUsecase := usecase.NewAuthUsecase(userRepo, authManager)
 	userUsecase := usecase.NewUserUsecase(userRepo)
 	vehicleUsecase := usecase.NewVehicleUsecase(vehicleRepo)
 	rentalUsecase := usecase.NewRentalUsecase(rentalRepo, vehicleRepo)
+	paymentUsecase := usecase.NewPaymentUsecase(paymentRepo, rentalRepo, userRepo, a.XenditClient)
 
 	// Handlers
 	authHandler := handler.NewAuthHandler(authUsecase)
 	userHandler := handler.NewUserHandler(userUsecase)
 	vehicleHandler := handler.NewVehicleHandler(vehicleUsecase)
 	rentalHandler := handler.NewRentalHandler(rentalUsecase)
+	paymentHandler := handler.NewPaymentHandler(paymentUsecase)
 
 	// Routes
 	e.GET("/", func(c echo.Context) error {
@@ -69,6 +72,9 @@ func (a *App) Run() {
 
 	rentalGroup := api.Group("/rentals", authMiddleware)
 	rentalHandler.RegisterRoutes(rentalGroup)
+
+	paymentGroup := api.Group("/payments", authMiddleware)
+	paymentHandler.RegisterRoutes(paymentGroup)
 
 	addr := fmt.Sprintf("%s:%d", a.Config.App.Host, a.Config.App.Port)
 
