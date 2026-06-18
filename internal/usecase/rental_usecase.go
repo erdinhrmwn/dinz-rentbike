@@ -147,7 +147,7 @@ func toRentalResponse(r *entity.Rental) dto.RentalResponse {
 	}
 
 	if r.Vehicle != nil {
-		res.Vehicle = &dto.VehicleResponse{
+		res.Vehicle = dto.VehicleResponse{
 			ID:           r.Vehicle.ID,
 			Type:         r.Vehicle.Type,
 			Brand:        r.Vehicle.Brand,
@@ -160,6 +160,42 @@ func toRentalResponse(r *entity.Rental) dto.RentalResponse {
 			CreatedAt:    r.Vehicle.CreatedAt.Format(time.RFC3339),
 			UpdatedAt:    r.Vehicle.UpdatedAt.Format(time.RFC3339),
 		}
+	}
+
+	if r.Payment != nil {
+		p := r.Payment
+		payment := dto.PaymentResponse{
+			ID:               p.ID,
+			UserID:           p.UserID,
+			RentalID:         p.RentalID,
+			Amount:           p.Amount,
+			Status:           p.Status,
+			PaymentMethod:    p.PaymentMethod,
+			XenditInvoiceID:  p.XenditInvoiceID,
+			XenditPaymentURL: p.XenditPaymentURL,
+			CreatedAt:        p.CreatedAt.Format(time.RFC3339),
+			UpdatedAt:        p.UpdatedAt.Format(time.RFC3339),
+		}
+		if p.PaidAt != nil {
+			paidAt := p.PaidAt.Format(time.RFC3339)
+			payment.PaidAt = &paidAt
+		}
+		res.Payment = &payment
+	}
+
+	if r.Review != nil {
+		rv := r.Review
+		review := dto.ReviewResponse{
+			ID:        rv.ID,
+			UserID:    rv.UserID,
+			VehicleID: rv.VehicleID,
+			RentalID:  rv.RentalID,
+			Rating:    rv.Rating,
+			Comment:   rv.Comment,
+			CreatedAt: rv.CreatedAt.Format(time.RFC3339),
+			UpdatedAt: rv.UpdatedAt.Format(time.RFC3339),
+		}
+		res.Review = &review
 	}
 
 	return res

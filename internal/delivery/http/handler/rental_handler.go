@@ -22,8 +22,8 @@ func NewRentalHandler(rentalUsecase contract.RentalUsecase) *RentalHandler {
 func (h *RentalHandler) RegisterRoutes(g *echo.Group) {
 	g.GET("", h.GetByUserID)
 	g.GET("/:id", h.GetByID)
-	g.POST("", h.Create)
-	g.PATCH("/:id/cancel", h.Cancel)
+	g.POST("/create", h.Create)
+	g.POST("/cancel", h.Cancel)
 }
 
 func (h *RentalHandler) GetByUserID(c echo.Context) error {
@@ -70,12 +70,13 @@ func (h *RentalHandler) Create(c echo.Context) error {
 
 func (h *RentalHandler) Cancel(c echo.Context) error {
 	userID := c.Get("user_id").(int)
-	rentalID, err := strconv.Atoi(c.Param("id"))
-	if err != nil {
-		return response.ErrorResponse(c, http.StatusBadRequest, "invalid rental id")
+
+	var req dto.CancelRentalRequest
+	if err := c.Bind(&req); err != nil {
+		return response.ErrorResponse(c, http.StatusBadRequest, "invalid request")
 	}
 
-	if err := h.rentalUsecase.Cancel(c.Request().Context(), userID, rentalID); err != nil {
+	if err := h.rentalUsecase.Cancel(c.Request().Context(), userID, req.RentalID); err != nil {
 		return response.ErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 

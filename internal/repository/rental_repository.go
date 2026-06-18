@@ -19,7 +19,7 @@ func NewRentalRepository(db *gorm.DB) contract.RentalRepository {
 
 func (r *rentalRepository) FindByID(ctx context.Context, id int) (*entity.Rental, error) {
 	var rental entity.Rental
-	query := r.db.WithContext(ctx).Preload("Vehicle").First(&rental, id)
+	query := r.db.WithContext(ctx).Preload("Vehicle").Preload("Payment").Preload("Review").First(&rental, id)
 	if query.Error != nil {
 		return nil, query.Error
 	}
@@ -30,6 +30,8 @@ func (r *rentalRepository) FindByUserID(ctx context.Context, userID int) ([]enti
 	var rentals []entity.Rental
 	query := r.db.WithContext(ctx).
 		Preload("Vehicle").
+		Preload("Payment").
+		Preload("Review").
 		Where("user_id = ?", userID).
 		Order("created_at DESC").
 		Find(&rentals)

@@ -10,6 +10,10 @@ type CreateRentalRequest struct {
 	EndTime   string `json:"end_time" validate:"required"`
 }
 
+type CancelRentalRequest struct {
+	RentalID int `json:"rental_id" validate:"required"`
+}
+
 // ============================================================
 // Response
 // ============================================================
@@ -25,5 +29,7 @@ type RentalResponse struct {
 	Status     string           `json:"status"`
 	CreatedAt  string           `json:"created_at"`
 	UpdatedAt  string           `json:"updated_at"`
-	Vehicle    *VehicleResponse `json:"vehicle,omitempty"`
+	Vehicle    VehicleResponse  `json:"vehicle,omitempty"`
+	Payment    *PaymentResponse `json:"payment,omitempty"`
+	Review     *ReviewResponse  `json:"review,omitempty"`
 }
