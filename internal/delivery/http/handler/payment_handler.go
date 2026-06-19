@@ -22,7 +22,6 @@ func NewPaymentHandler(paymentUsecase contract.PaymentUsecase) *PaymentHandler {
 func (h *PaymentHandler) RegisterRoutes(g *echo.Group) {
 	g.GET("", h.UserPayments)
 	g.GET("/:id", h.PaymentDetail)
-	g.POST("", h.CreatePayment)
 	g.POST("/cancel", h.CancelPayment)
 }
 
@@ -35,22 +34,6 @@ func (h *PaymentHandler) UserPayments(c echo.Context) error {
 	}
 
 	return response.SuccessResponse(c, http.StatusOK, "get payments success", payments)
-}
-
-func (h *PaymentHandler) CreatePayment(c echo.Context) error {
-	userID := c.Get("user_id").(int)
-
-	var req dto.CreatePaymentRequest
-	if err := c.Bind(&req); err != nil {
-		return response.ErrorResponse(c, http.StatusBadRequest, "invalid request")
-	}
-
-	payment, err := h.paymentUsecase.CreatePayment(c.Request().Context(), userID, req.RentalID)
-	if err != nil {
-		return response.ErrorResponse(c, http.StatusBadRequest, err.Error())
-	}
-
-	return response.SuccessResponse(c, http.StatusCreated, "create payment success", payment)
 }
 
 func (h *PaymentHandler) CancelPayment(c echo.Context) error {
