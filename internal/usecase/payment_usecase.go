@@ -113,7 +113,7 @@ func (u *paymentUsecase) CreatePayment(ctx context.Context, userID int, rentalID
 		Amount:      rental.TotalPrice,
 		Currency:    "IDR",
 		PayerEmail:  user.Email,
-		Description: fmt.Sprintf("Sewa %s %s", rental.Vehicle.Brand, rental.Vehicle.Name),
+		Description: fmt.Sprintf("Sewa %s %s - %d jam", rental.Vehicle.Brand, rental.Vehicle.Name, rental.TotalHours),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to create invoice: %w", err)
