@@ -20,9 +20,19 @@ func NewAdminVehicleHandler(vehicleUsecase contract.VehicleUsecase) *AdminVehicl
 }
 
 func (h *AdminVehicleHandler) RegisterRoutes(g *echo.Group) {
+	g.GET("", h.List)
 	g.POST("", h.Create)
 	g.PUT("/:id", h.Update)
 	g.DELETE("/:id", h.Delete)
+}
+
+func (h *AdminVehicleHandler) List(c echo.Context) error {
+	vehicles, err := h.vehicleUsecase.VehicleList(c.Request().Context())
+	if err != nil {
+		return response.ErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
+	return response.SuccessResponse(c, http.StatusOK, "list vehicles success", vehicles)
 }
 
 func (h *AdminVehicleHandler) Create(c echo.Context) error {
