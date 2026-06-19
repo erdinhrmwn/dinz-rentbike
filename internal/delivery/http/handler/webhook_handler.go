@@ -31,9 +31,9 @@ func (h *WebhookHandler) RegisterRoutes(g *echo.Group) {
 }
 
 type xenditWebhookPayload struct {
-	Event      string `json:"event"`
-	BusinessID string `json:"business_id"`
-	Data       any    `json:"data"`
+	Event      string          `json:"event"`
+	BusinessID string          `json:"business_id"`
+	Data       json.RawMessage `json:"data"`
 }
 
 type paymentSessionPayload struct {
@@ -72,8 +72,9 @@ func (h *WebhookHandler) XenditWebhook(c echo.Context) error {
 		return response.ErrorResponse(c, http.StatusBadRequest, "invalid event")
 	}
 
-	data, ok := payload.Data.(paymentSessionPayload)
-	if !ok {
+	var data paymentSessionPayload
+	if err := json.Unmarshal(payload.Data, &data); err != nil {
+		logger.Log.Error().Err(err).Str("raw_data", string(payload.Data)).Msg("xendit webhook: failed to unmarshal data")
 		return response.ErrorResponse(c, http.StatusBadRequest, "invalid data")
 	}
 
