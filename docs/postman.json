@@ -1,0 +1,362 @@
+{
+  "info": {
+    "name": "Dinz RentBike API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "API untuk rental motor & mobil"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080/api/v1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": {
+      "token": "{{token}}"
+    }
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Budi Santoso\",\n  \"email\": \"budi@rentbike.com\",\n  \"phone\": \"081234567890\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var data = JSON.parse(responseBody);",
+                  "if (data.success) {",
+                  "  pm.collectionVariables.set('token', data.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"budi@rentbike.com\",\n  \"password\": \"password123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/users/me"
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/users/update",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Budi Updated\",\n  \"phone\": \"081234567891\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/users/change-password",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"old_password\": \"password123\",\n  \"new_password\": \"newpass123\",\n  \"confirm_password\": \"newpass123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vehicle",
+      "item": [
+        {
+          "name": "List Vehicles",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/vehicles"
+          }
+        },
+        {
+          "name": "Vehicle Detail",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/vehicles/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rental",
+      "item": [
+        {
+          "name": "My Rentals",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/rentals"
+          }
+        },
+        {
+          "name": "Rental Detail",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/rentals/1"
+          }
+        },
+        {
+          "name": "Create Rental + Auto Payment",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/rentals/create",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicle_id\": 3,\n  \"start_time\": \"2026-06-21 10:00\",\n  \"end_time\": \"2026-06-21 12:00\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Cancel Rental",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/rentals/cancel",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rental_id\": 1\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payment",
+      "item": [
+        {
+          "name": "My Payments",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/payments"
+          }
+        },
+        {
+          "name": "Payment Detail",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/payments/1"
+          }
+        },
+        {
+          "name": "Cancel Payment",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/payments/cancel",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rental_id\": 1\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Review",
+      "item": [
+        {
+          "name": "My Reviews",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/reviews"
+          }
+        },
+        {
+          "name": "Create Review",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/reviews/create",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rental_id\": 1,\n  \"rating\": 5,\n  \"comment\": \"Motor sangat nyaman!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Edit Review",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/reviews/edit",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rental_id\": 1,\n  \"rating\": 4,\n  \"comment\": \"Updated review\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Review",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/reviews/delete",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rental_id\": 1\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "List Vehicles",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/vehicles"
+          }
+        },
+        {
+          "name": "Create Vehicle",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/admin/vehicles",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"motor\",\n  \"brand\": \"Honda\",\n  \"name\": \"PCX 160\",\n  \"category\": \"Matic\",\n  \"price_per_hour\": 60000\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Vehicle",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/admin/vehicles/1",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"motor\",\n  \"brand\": \"Honda\",\n  \"name\": \"Vario 160\",\n  \"category\": \"Matic\",\n  \"price_per_hour\": 55000,\n  \"status\": \"available\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Vehicle",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/admin/vehicles/1"
+          }
+        },
+        {
+          "name": "List Rentals",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/rentals"
+          }
+        },
+        {
+          "name": "Rental Detail",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/rentals/1"
+          }
+        },
+        {
+          "name": "Update Rental Status",
+          "request": {
+            "method": "PATCH",
+            "url": "{{base_url}}/admin/rentals/1/status",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\"\n}"
+            }
+          }
+        },
+        {
+          "name": "List Payments",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/payments"
+          }
+        },
+        {
+          "name": "Payment Detail",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/admin/payments/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhook",
+      "item": [
+        {
+          "name": "Xendit - Payment Completed",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/webhook",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-callback-token", "value": "{{webhook_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"payment_session.completed\",\n  \"data\": {\n    \"payment_session_id\": \"ps-xxx\",\n    \"status\": \"COMPLETED\",\n    \"amount\": 70000,\n    \"metadata\": {\n      \"email\": \"user@mail.com\",\n      \"name\": \"Budi\"\n    }\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Xendit - Payment Expired",
+          "request": {
+            "method": "POST",
+            "url": "http://localhost:8080/webhook",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "x-callback-token", "value": "{{webhook_token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"payment_session.expired\",\n  \"data\": {\n    \"payment_session_id\": \"ps-xxx\",\n    \"status\": \"EXPIRED\"\n  }\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
