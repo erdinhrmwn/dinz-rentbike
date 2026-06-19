@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 
@@ -32,11 +33,13 @@ func (u *authUsecase) Register(ctx context.Context, req *dto.RegisterRequest) (*
 	}
 
 	user := &entity.User{
-		Name:     req.Name,
-		Email:    req.Email,
-		Phone:    req.Phone,
-		Password: hashed,
-		Role:     constants.UserRoleCustomer,
+		Name:      req.Name,
+		Email:     req.Email,
+		Phone:     req.Phone,
+		Password:  hashed,
+		Role:      constants.UserRoleCustomer,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	if err := u.userRepo.Create(ctx, user); err != nil {
@@ -57,11 +60,13 @@ func (u *authUsecase) Register(ctx context.Context, req *dto.RegisterRequest) (*
 
 	return &dto.RegisterResponse{
 		User: dto.UserResponse{
-			ID:    user.ID,
-			Name:  user.Name,
-			Email: user.Email,
-			Phone: user.Phone,
-			Role:  user.Role,
+			ID:        user.ID,
+			Name:      user.Name,
+			Email:     user.Email,
+			Phone:     user.Phone,
+			Role:      user.Role,
+			CreatedAt: user.CreatedAt.Format(time.RFC3339),
+			UpdatedAt: user.UpdatedAt.Format(time.RFC3339),
 		},
 	}, nil
 }
