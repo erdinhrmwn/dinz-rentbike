@@ -113,6 +113,7 @@ func (u *paymentUsecase) CreatePayment(ctx context.Context, userID int, rentalID
 		Amount:      rental.TotalPrice,
 		Currency:    "IDR",
 		PayerEmail:  user.Email,
+		PayerName:   user.Name,
 		Description: fmt.Sprintf("Sewa %s %s - %d jam", rental.Vehicle.Brand, rental.Vehicle.Name, rental.TotalHours),
 	})
 	if err != nil {

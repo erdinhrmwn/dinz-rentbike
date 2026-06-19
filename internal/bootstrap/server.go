@@ -62,7 +62,7 @@ func (a *App) Run() {
 	adminPaymentHandler := handler.NewAdminPaymentHandler(paymentUsecase)
 
 	// Webhook
-	webhookHandler := handler.NewWebhookHandler(a.Config.Xendit.WebhookToken, paymentUsecase, rentalUsecase)
+	webhookHandler := handler.NewWebhookHandler(a.Config.Xendit.WebhookToken, paymentUsecase, rentalUsecase, a.MailjetClient)
 	webhookHandler.RegisterRoutes(e.Group("/webhook"))
 
 	// Middleware

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
@@ -17,10 +18,11 @@ type WebhookHandler struct {
 	webhookToken   string
 	paymentUsecase contract.PaymentUsecase
 	rentalUsecase  contract.RentalUsecase
+	mailjetService contract.MailjetService
 }
 
-func NewWebhookHandler(webhookToken string, paymentUsecase contract.PaymentUsecase, rentalUsecase contract.RentalUsecase) *WebhookHandler {
-	return &WebhookHandler{webhookToken: webhookToken, paymentUsecase: paymentUsecase, rentalUsecase: rentalUsecase}
+func NewWebhookHandler(webhookToken string, paymentUsecase contract.PaymentUsecase, rentalUsecase contract.RentalUsecase, mailjetService contract.MailjetService) *WebhookHandler {
+	return &WebhookHandler{webhookToken: webhookToken, paymentUsecase: paymentUsecase, rentalUsecase: rentalUsecase, mailjetService: mailjetService}
 }
 
 func (h *WebhookHandler) RegisterRoutes(g *echo.Group) {
@@ -38,11 +40,14 @@ type xenditPaymentSessionWebhookPayload struct {
 		Amount           float64 `json:"amount"`
 		Currency         string  `json:"currency"`
 		Country          string  `json:"country"`
+		Metadata         struct {
+			Email string `json:"email"`
+			Name  string `json:"name"`
+		} `json:"metadata"`
 	} `json:"data"`
 }
 
 func (h *WebhookHandler) XenditWebhook(c echo.Context) error {
-	// Verify callback token
 	callbackToken := c.Request().Header.Get("x-callback-token")
 	if callbackToken != h.webhookToken {
 		logger.Log.Warn().Str("ip", c.RealIP()).Str("callback_token", callbackToken).Msg("xendit webhook: invalid callback token")
@@ -66,14 +71,12 @@ func (h *WebhookHandler) XenditWebhook(c echo.Context) error {
 		Str("status", payload.Data.Status).
 		Msg("xendit webhook received")
 
-	// Find payment by xendit session ID
 	payment, err := h.paymentUsecase.FindByInvoiceID(c.Request().Context(), payload.Data.PaymentSessionID)
 	if err != nil {
 		logger.Log.Warn().Str("session_id", payload.Data.PaymentSessionID).Msg("payment not found for session")
 		return response.ErrorResponse(c, http.StatusNotFound, "payment not found")
 	}
 
-	// Update payment status based on webhook
 	switch payload.Data.Status {
 	case "COMPLETED":
 		payment.Status = constants.PaymentStatusPaid
@@ -86,6 +89,21 @@ func (h *WebhookHandler) XenditWebhook(c echo.Context) error {
 	updatedPayment, err := h.paymentUsecase.UpdatePayment(c.Request().Context(), payment.ID, payment.Status)
 	if err != nil {
 		return response.ErrorResponse(c, http.StatusInternalServerError, "failed to update payment")
+	}
+
+	// Send email notification if payment completed
+	if updatedPayment.Status == constants.PaymentStatusPaid {
+		name := payload.Data.Metadata.Name
+		go h.mailjetService.Send(&contract.EmailRequest{
+			ToEmail: payload.Data.Metadata.Email,
+			ToName:  name,
+			Subject: "Pembayaran Berhasil - Dinz RentBike",
+			HTMLBody: fmt.Sprintf(`
+				<h2>Pembayaran Berhasil! ✅</h2>
+				<p>Halo %s, terima kasih! Pembayaran Anda sebesar <strong>Rp %.0f</strong> telah kami terima.</p>
+				<p>Selamat menikmati perjalanan Anda! 🏍️</p>
+			`, name, payload.Data.Amount),
+		})
 	}
 
 	return response.SuccessResponse(c, http.StatusOK, "webhook processed", updatedPayment)

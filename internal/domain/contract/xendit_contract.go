@@ -9,6 +9,7 @@ type InvoiceRequest struct {
 	Amount      float64
 	Currency    string
 	PayerEmail  string
+	PayerName   string
 	Description string
 }
 

@@ -47,6 +47,7 @@ func (c *Client) CreateInvoice(ctx context.Context, req *contract.InvoiceRequest
 		},
 		"metadata": map[string]string{
 			"email": req.PayerEmail,
+			"name":  req.PayerName,
 		},
 	})
 	if err != nil {
