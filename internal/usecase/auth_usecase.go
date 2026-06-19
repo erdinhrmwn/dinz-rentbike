@@ -40,6 +40,9 @@ func (u *authUsecase) Register(ctx context.Context, req *dto.RegisterRequest) (*
 	}
 
 	if err := u.userRepo.Create(ctx, user); err != nil {
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			return nil, errors.New("email already registered")
+		}
 		return nil, err
 	}
 
