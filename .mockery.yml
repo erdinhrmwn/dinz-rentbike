@@ -1,0 +1,9 @@
+all: false
+template: testify
+packages:
+  dinz-rentbike/internal/domain/contract:
+    config:
+      all: true
+      dir: tests/mocks
+      pkgname: mocks
+      filename: "mocks.go"

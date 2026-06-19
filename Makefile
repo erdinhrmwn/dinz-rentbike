@@ -10,7 +10,10 @@ build:
 	go build -o $(BUILD_DIR)/$(APP_NAME) ./cmd/app/main.go
 
 test:
-	go test ./... -v
+	go test ./tests -v
+
+tidy:
+	go mod tidy
 
 fmt:
 	goimports -w .

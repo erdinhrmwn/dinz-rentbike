@@ -3,9 +3,9 @@ package middleware
 import (
 	"net/http"
 
-	"dinz-rentbike/pkg/response"
-
 	echo "github.com/labstack/echo/v4"
+
+	"dinz-rentbike/pkg/response"
 )
 
 func RoleMiddleware(role string) echo.MiddlewareFunc {
