@@ -58,6 +58,15 @@ func (r *paymentRepository) FindByRentalID(ctx context.Context, rentalID int) (*
 	return &payment, nil
 }
 
+func (r *paymentRepository) FindByInvoiceID(ctx context.Context, invoiceID string) (*entity.Payment, error) {
+	var payment entity.Payment
+	query := r.db.WithContext(ctx).Where("xendit_invoice_id = ?", invoiceID).First(&payment)
+	if query.Error != nil {
+		return nil, query.Error
+	}
+	return &payment, nil
+}
+
 func (r *paymentRepository) Create(ctx context.Context, payment *entity.Payment) error {
 	query := r.db.WithContext(ctx).Create(payment)
 	if query.Error != nil {

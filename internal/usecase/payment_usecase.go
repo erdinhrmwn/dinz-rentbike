@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"gorm.io/gorm"
+
 	"dinz-rentbike/internal/domain/constants"
 	"dinz-rentbike/internal/domain/contract"
 	"dinz-rentbike/internal/domain/dto"
@@ -40,6 +42,9 @@ func (u *paymentUsecase) UserPayments(ctx context.Context, userID int) ([]dto.Pa
 func (u *paymentUsecase) PaymentDetail(ctx context.Context, userID int, paymentID int) (*dto.PaymentResponse, error) {
 	payment, err := u.paymentRepo.FindByID(ctx, paymentID)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("payment not found")
+		}
 		return nil, err
 	}
 
@@ -54,6 +59,9 @@ func (u *paymentUsecase) PaymentDetail(ctx context.Context, userID int, paymentI
 func (u *paymentUsecase) GetByRentalID(ctx context.Context, userID int, rentalID int) (*dto.PaymentResponse, error) {
 	rental, err := u.rentalRepo.FindByID(ctx, rentalID)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("rental not found")
+		}
 		return nil, err
 	}
 
@@ -73,6 +81,9 @@ func (u *paymentUsecase) GetByRentalID(ctx context.Context, userID int, rentalID
 func (u *paymentUsecase) CreatePayment(ctx context.Context, userID int, rentalID int) (*dto.PaymentResponse, error) {
 	rental, err := u.rentalRepo.FindByID(ctx, rentalID)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("rental not found")
+		}
 		return nil, err
 	}
 
@@ -115,6 +126,39 @@ func (u *paymentUsecase) CreatePayment(ctx context.Context, userID int, rentalID
 		return nil, err
 	}
 
+	res := toPaymentResponse(payment)
+	return &res, nil
+}
+
+func (u *paymentUsecase) FindByInvoiceID(ctx context.Context, invoiceID string) (*dto.PaymentResponse, error) {
+	payment, err := u.paymentRepo.FindByInvoiceID(ctx, invoiceID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("payment not found")
+		}
+		return nil, err
+	}
+
+	res := toPaymentResponse(payment)
+	return &res, nil
+}
+
+func (u *paymentUsecase) UpdatePayment(ctx context.Context, paymentID int, status string) (*dto.PaymentResponse, error) {
+	payment, err := u.paymentRepo.FindByID(ctx, paymentID)
+	if err != nil {
+		return nil, err
+	}
+
+	if status == constants.PaymentStatusPaid {
+		now := time.Now()
+		payment.PaidAt = &now
+	}
+
+	payment.Status = status
+
+	if err := u.paymentRepo.Update(ctx, payment); err != nil {
+		return nil, err
+	}
 	res := toPaymentResponse(payment)
 	return &res, nil
 }
@@ -183,7 +227,6 @@ func toPaymentResponse(p *entity.Payment) dto.PaymentResponse {
 		RentalID:         p.RentalID,
 		Amount:           p.Amount,
 		Status:           p.Status,
-		PaymentMethod:    p.PaymentMethod,
 		XenditInvoiceID:  p.XenditInvoiceID,
 		XenditPaymentURL: p.XenditPaymentURL,
 		CreatedAt:        p.CreatedAt.Format(time.RFC3339),

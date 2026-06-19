@@ -273,9 +273,6 @@ components:
         status:
           type: string
           enum: [pending, paid, failed, expired]
-        payment_method:
-          type: string
-          nullable: true
         xendit_invoice_id:
           type: string
           nullable: true

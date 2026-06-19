@@ -1,9 +1,9 @@
 package config
 
 import (
-	"dinz-rentbike/pkg/logger"
-
 	"github.com/spf13/viper"
+
+	"dinz-rentbike/pkg/logger"
 )
 
 type Config struct {
@@ -42,9 +42,10 @@ type JwtConfig struct {
 }
 
 type XenditConfig struct {
-	BaseURL   string
-	PublicKey string
-	SecretKey string
+	BaseURL      string
+	PublicKey    string
+	SecretKey    string
+	WebhookToken string
 }
 
 type MailjetConfig struct {
@@ -88,9 +89,10 @@ func Load() (*Config, error) {
 			Secret: v.GetString("JWT_SECRET"),
 		},
 		Xendit: XenditConfig{
-			BaseURL:   v.GetString("XENDIT_BASE_URL"),
-			PublicKey: v.GetString("XENDIT_PUBLIC_KEY"),
-			SecretKey: v.GetString("XENDIT_SECRET_KEY"),
+			BaseURL:      v.GetString("XENDIT_BASE_URL"),
+			PublicKey:    v.GetString("XENDIT_PUBLIC_KEY"),
+			SecretKey:    v.GetString("XENDIT_SECRET_KEY"),
+			WebhookToken: v.GetString("XENDIT_WEBHOOK_TOKEN"),
 		},
 		Mailjet: MailjetConfig{
 			BaseURL:   v.GetString("MAILJET_BASE_URL"),

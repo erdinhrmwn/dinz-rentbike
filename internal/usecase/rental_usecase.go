@@ -212,7 +212,6 @@ func toRentalResponse(r *entity.Rental) dto.RentalResponse {
 			RentalID:         p.RentalID,
 			Amount:           p.Amount,
 			Status:           p.Status,
-			PaymentMethod:    p.PaymentMethod,
 			XenditInvoiceID:  p.XenditInvoiceID,
 			XenditPaymentURL: p.XenditPaymentURL,
 			CreatedAt:        p.CreatedAt.Format(time.RFC3339),

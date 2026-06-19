@@ -61,6 +61,10 @@ func (a *App) Run() {
 	adminRentalHandler := handler.NewAdminRentalHandler(rentalUsecase)
 	adminPaymentHandler := handler.NewAdminPaymentHandler(paymentUsecase)
 
+	// Webhook
+	webhookHandler := handler.NewWebhookHandler(a.Config.Xendit.WebhookToken, paymentUsecase, rentalUsecase)
+	webhookHandler.RegisterRoutes(e.Group("/webhook"))
+
 	// Middleware
 	adminMiddleware := middleware.RoleMiddleware(constants.UserRoleAdmin)
 	customerMiddleware := middleware.RoleMiddleware(constants.UserRoleCustomer)

@@ -22,7 +22,6 @@ type PaymentResponse struct {
 	RentalID         int     `json:"rental_id"`
 	Amount           float64 `json:"amount"`
 	Status           string  `json:"status"`
-	PaymentMethod    *string `json:"payment_method"`
 	XenditInvoiceID  *string `json:"xendit_invoice_id"`
 	XenditPaymentURL *string `json:"xendit_payment_url"`
 	PaidAt           *string `json:"paid_at"`

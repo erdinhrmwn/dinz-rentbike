@@ -8,7 +8,6 @@ type Payment struct {
 	RentalID         int        `json:"rental_id" gorm:"not null"`
 	Amount           float64    `json:"amount" gorm:"not null"`
 	Status           string     `json:"status" gorm:"not null;default:pending"`
-	PaymentMethod    *string    `json:"payment_method"`
 	XenditInvoiceID  *string    `json:"xendit_invoice_id" gorm:"unique"`
 	XenditPaymentURL *string    `json:"xendit_payment_url"`
 	PaidAt           *time.Time `json:"paid_at"`

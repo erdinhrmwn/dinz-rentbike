@@ -46,7 +46,6 @@ CREATE TABLE IF NOT EXISTS payments (
 	rental_id INT NOT NULL REFERENCES rentals (id),
 	amount DECIMAL(12, 2) NOT NULL,
 	status VARCHAR(20) NOT NULL DEFAULT 'pending',
-	payment_method VARCHAR(50),
 	xendit_invoice_id VARCHAR(255) UNIQUE,
 	xendit_payment_url TEXT,
 	paid_at TIMESTAMPTZ,
