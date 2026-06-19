@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	echo "github.com/labstack/echo/v4"
 
@@ -67,9 +68,9 @@ func (h *WebhookHandler) XenditWebhook(c echo.Context) error {
 		return response.ErrorResponse(c, http.StatusBadRequest, "invalid payload")
 	}
 
-	// if !strings.HasPrefix("payment_session.", payload.Event) {
-	// 	return response.ErrorResponse(c, http.StatusBadRequest, "invalid event")
-	// }
+	if !strings.HasPrefix(payload.Event, "payment_session.") {
+		return response.ErrorResponse(c, http.StatusBadRequest, "invalid event")
+	}
 
 	data, ok := payload.Data.(paymentSessionPayload)
 	if !ok {
