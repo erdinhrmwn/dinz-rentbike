@@ -1,6 +1,8 @@
 package config
 
 import (
+	"dinz-rentbike/pkg/logger"
+
 	"github.com/spf13/viper"
 )
 
@@ -59,9 +61,7 @@ func Load() (*Config, error) {
 	v.AutomaticEnv()
 
 	if err := v.ReadInConfig(); err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			return nil, err
-		}
+		logger.Log.Warn().Msg("there is no .env file, using default values")
 	}
 
 	cfg := &Config{
