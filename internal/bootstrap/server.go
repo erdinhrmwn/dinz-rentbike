@@ -43,7 +43,7 @@ func (a *App) Run() {
 	reviewRepo := repository.NewReviewRepository(a.DB)
 
 	// Usecases
-	authUsecase := usecase.NewAuthUsecase(userRepo, authManager)
+	authUsecase := usecase.NewAuthUsecase(userRepo, authManager, a.MailjetClient)
 	userUsecase := usecase.NewUserUsecase(userRepo)
 	vehicleUsecase := usecase.NewVehicleUsecase(vehicleRepo)
 	rentalUsecase := usecase.NewRentalUsecase(rentalRepo, vehicleRepo)

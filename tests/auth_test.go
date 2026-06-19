@@ -24,7 +24,7 @@ func TestRegister_Success(t *testing.T) {
 	repo.EXPECT().Create(mock.Anything, mock.Anything).Return(nil)
 
 	authManager := jwt.NewAuthManager(&config.JwtConfig{Secret: "test-secret"})
-	authUsecase := usecase.NewAuthUsecase(repo, authManager)
+	authUsecase := usecase.NewAuthUsecase(repo, authManager, nil)
 
 	req := &dto.RegisterRequest{
 		Name:     "Test User",
@@ -46,7 +46,7 @@ func TestRegister_DuplicateEmail(t *testing.T) {
 	repo.EXPECT().Create(mock.Anything, mock.Anything).Return(errors.New("duplicate key")).Once()
 
 	authManager := jwt.NewAuthManager(&config.JwtConfig{Secret: "test-secret"})
-	authUsecase := usecase.NewAuthUsecase(repo, authManager)
+	authUsecase := usecase.NewAuthUsecase(repo, authManager, nil)
 
 	req := &dto.RegisterRequest{
 		Name:     "Test User",
@@ -76,7 +76,7 @@ func TestLogin_Success(t *testing.T) {
 		}, nil)
 
 	authManager := jwt.NewAuthManager(&config.JwtConfig{Secret: "test-secret"})
-	authUsecase := usecase.NewAuthUsecase(repo, authManager)
+	authUsecase := usecase.NewAuthUsecase(repo, authManager, nil)
 
 	req := &dto.LoginRequest{
 		Email:    "login@example.com",
@@ -95,7 +95,7 @@ func TestLogin_InvalidEmail(t *testing.T) {
 		Return(nil, errors.New("record not found"))
 
 	authManager := jwt.NewAuthManager(&config.JwtConfig{Secret: "test-secret"})
-	authUsecase := usecase.NewAuthUsecase(repo, authManager)
+	authUsecase := usecase.NewAuthUsecase(repo, authManager, nil)
 
 	req := &dto.LoginRequest{
 		Email:    "unknown@example.com",
@@ -120,7 +120,7 @@ func TestLogin_InvalidPassword(t *testing.T) {
 		}, nil)
 
 	authManager := jwt.NewAuthManager(&config.JwtConfig{Secret: "test-secret"})
-	authUsecase := usecase.NewAuthUsecase(repo, authManager)
+	authUsecase := usecase.NewAuthUsecase(repo, authManager, nil)
 
 	req := &dto.LoginRequest{
 		Email:    "user@example.com",
