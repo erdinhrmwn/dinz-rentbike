@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 
 	echo "github.com/labstack/echo/v4"
 
@@ -33,7 +32,7 @@ func (h *WebhookHandler) RegisterRoutes(g *echo.Group) {
 type xenditWebhookPayload struct {
 	Event      string `json:"event"`
 	BusinessID string `json:"business_id"`
-	Data       any      `json:"data"`
+	Data       any    `json:"data"`
 }
 
 type paymentSessionPayload struct {
