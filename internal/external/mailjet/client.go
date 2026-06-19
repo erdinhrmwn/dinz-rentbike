@@ -34,7 +34,7 @@ func (c *Client) Send(req *contract.EmailRequest) error {
 		"Messages": []map[string]any{
 			{
 				"From": map[string]string{
-					"Email": "noreply@dinzrentbike.com",
+					"Email": "noreply@erdinhrmwn.studio",
 					"Name":  "Dinz RentBike",
 				},
 				"To": []map[string]string{
