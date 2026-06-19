@@ -12,11 +12,12 @@ import (
 )
 
 type RentalHandler struct {
-	rentalUsecase contract.RentalUsecase
+	rentalUsecase  contract.RentalUsecase
+	paymentUsecase contract.PaymentUsecase
 }
 
-func NewRentalHandler(rentalUsecase contract.RentalUsecase) *RentalHandler {
-	return &RentalHandler{rentalUsecase: rentalUsecase}
+func NewRentalHandler(rentalUsecase contract.RentalUsecase, paymentUsecase contract.PaymentUsecase) *RentalHandler {
+	return &RentalHandler{rentalUsecase: rentalUsecase, paymentUsecase: paymentUsecase}
 }
 
 func (h *RentalHandler) RegisterRoutes(g *echo.Group) {
@@ -65,6 +66,13 @@ func (h *RentalHandler) CreateRental(c echo.Context) error {
 		return response.ErrorResponse(c, http.StatusBadRequest, err.Error())
 	}
 
+	payment, err := h.paymentUsecase.CreatePayment(c.Request().Context(), userID, rental.ID)
+	if err != nil {
+		_ = h.rentalUsecase.CancelRental(c.Request().Context(), userID, rental.ID)
+		return response.ErrorResponse(c, http.StatusBadRequest, err.Error())
+	}
+
+	rental.Payment = payment
 	return response.SuccessResponse(c, http.StatusCreated, "create rental success", rental)
 }
 

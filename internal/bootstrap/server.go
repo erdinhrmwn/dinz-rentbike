@@ -54,7 +54,7 @@ func (a *App) Run() {
 	authHandler := handler.NewAuthHandler(authUsecase)
 	userHandler := handler.NewUserHandler(userUsecase)
 	vehicleHandler := handler.NewVehicleHandler(vehicleUsecase)
-	rentalHandler := handler.NewRentalHandler(rentalUsecase)
+	rentalHandler := handler.NewRentalHandler(rentalUsecase, paymentUsecase)
 	paymentHandler := handler.NewPaymentHandler(paymentUsecase)
 	reviewHandler := handler.NewReviewHandler(reviewUsecase)
 	adminVehicleHandler := handler.NewAdminVehicleHandler(vehicleUsecase)
