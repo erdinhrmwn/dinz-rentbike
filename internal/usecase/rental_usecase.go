@@ -49,14 +49,14 @@ func (u *rentalUsecase) UserRentals(ctx context.Context, userID int) ([]dto.Rent
 }
 
 func (u *rentalUsecase) CreateRental(ctx context.Context, userID int, req *dto.CreateRentalRequest) (*dto.RentalResponse, error) {
-	startTime, err := time.Parse(time.RFC3339, req.StartTime)
+	startTime, err := time.ParseInLocation("2006-01-02 15:04", req.StartTime, time.Local)
 	if err != nil {
-		return nil, errors.New("invalid start time format")
+		return nil, errors.New("invalid start time format, use YYYY-MM-DD HH:MM")
 	}
 
-	endTime, err := time.Parse(time.RFC3339, req.EndTime)
+	endTime, err := time.ParseInLocation("2006-01-02 15:04", req.EndTime, time.Local)
 	if err != nil {
-		return nil, errors.New("invalid end time format")
+		return nil, errors.New("invalid end time format, use YYYY-MM-DD HH:MM")
 	}
 
 	if endTime.Before(startTime) || endTime.Equal(startTime) {
